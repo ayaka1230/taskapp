@@ -9,7 +9,9 @@ import UIKit
 import RealmSwift
 import UserNotifications
 
-class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
+
+    @IBOutlet weak var searchField: UISearchBar!
 
     @IBOutlet weak var tableView: UITableView!
     
@@ -26,6 +28,16 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         // Do any additional setup after loading the view.
         tableView.delegate = self
         tableView.dataSource = self
+        searchField.delegate = self
+        
+        // 背景をタップしたら dismissKeyboard メソッドを呼ぶように設定する
+        let tapGesture: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        self.view.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc func dismissKeyboard() {
+        // キーボードを閉じる
+        view.endEditing(true)
     }
     
     // segue で画面遷移する時に呼ばれる
@@ -47,6 +59,23 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     // 入力画面から戻ってきた時に TableView を更新させる
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        // 検索バーの文字とテーブルはリセット
+        searchField.text = ""
+        taskArray = realm.objects(Task.self).sorted(byKeyPath: "date", ascending: true)
+        tableView.reloadData()
+    }
+    
+    //  検索バーに入力があったら呼ばれる
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        // 入力された値が nil でなければ検索を実行
+        if let word = searchBar.text {
+            if word == "" {
+                taskArray = realm.objects(Task.self).sorted(byKeyPath: "date", ascending: true)
+            } else {
+                // 入力された値とカテゴリが部分一致したタスク
+                taskArray = realm.objects(Task.self).filter("category CONTAINS %@", word)
+            }
+        }
         tableView.reloadData()
     }
 
@@ -58,15 +87,16 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     // 各セルの内容を返すメソッド
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // 再利用可能な cell を得る
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "TaskCell", for: indexPath) as! TaskTableViewCell
         let task = taskArray[indexPath.row]
-        cell.textLabel?.text = task.title
+        cell.titleLabel.text = task.title
 
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm"
-        
         let dateString: String = formatter.string(from: task.date)
-        cell.detailTextLabel?.text = dateString
+        cell.dateLabel.text = dateString
+        
+        cell.categoryLabel.text = task.category
 
         return cell
     }

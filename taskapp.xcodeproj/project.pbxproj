@@ -16,6 +16,7 @@
 		7B6D4D1A2636D3900038EDA6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7B6D4D192636D3900038EDA6 /* Assets.xcassets */; };
 		7B6D4D1D2636D3900038EDA6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7B6D4D1B2636D3900038EDA6 /* LaunchScreen.storyboard */; };
 		7B6D4D27263848B10038EDA6 /* InputViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B6D4D26263848B10038EDA6 /* InputViewController.swift */; };
+		7BD4AB34263A4D9400B095AA /* TaskTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7BD4AB33263A4D9400B095AA /* TaskTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +32,7 @@
 		7B6D4D1C2636D3900038EDA6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7B6D4D1E2636D3900038EDA6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7B6D4D26263848B10038EDA6 /* InputViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputViewController.swift; sourceTree = "<group>"; };
+		7BD4AB33263A4D9400B095AA /* TaskTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskTableViewCell.swift; sourceTree = "<group>"; };
 		89C300A7DC00B89A89FC0871 /* Pods-taskapp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-taskapp.debug.xcconfig"; path = "Target Support Files/Pods-taskapp/Pods-taskapp.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -80,6 +82,7 @@
 				7B6D4D142636D38F0038EDA6 /* ViewController.swift */,
 				7B6D4D26263848B10038EDA6 /* InputViewController.swift */,
 				7B5EA1002639491700D51FD8 /* Task.swift */,
+				7BD4AB33263A4D9400B095AA /* TaskTableViewCell.swift */,
 				7B6D4D162636D38F0038EDA6 /* Main.storyboard */,
 				7B6D4D192636D3900038EDA6 /* Assets.xcassets */,
 				7B6D4D1B2636D3900038EDA6 /* LaunchScreen.storyboard */,
@@ -214,6 +217,7 @@
 				7B6D4D152636D38F0038EDA6 /* ViewController.swift in Sources */,
 				7B6D4D112636D38F0038EDA6 /* AppDelegate.swift in Sources */,
 				7B5EA1012639491700D51FD8 /* Task.swift in Sources */,
+				7BD4AB34263A4D9400B095AA /* TaskTableViewCell.swift in Sources */,
 				7B6D4D132636D38F0038EDA6 /* SceneDelegate.swift in Sources */,
 				7B6D4D27263848B10038EDA6 /* InputViewController.swift in Sources */,
 			);
