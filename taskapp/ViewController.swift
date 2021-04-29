@@ -29,10 +29,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         tableView.delegate = self
         tableView.dataSource = self
         searchField.delegate = self
-        
-        // 背景をタップしたら dismissKeyboard メソッドを呼ぶように設定する
-        let tapGesture: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
-        self.view.addGestureRecognizer(tapGesture)
     }
     
     @objc func dismissKeyboard() {
@@ -82,6 +78,12 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             }
         }
         tableView.reloadData()
+    }
+    
+    // 検索時 return がタップされた時に呼ばれるメソッド
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        // キーボードを閉じる
+        searchBar.resignFirstResponder()
     }
 
     // データの数(=セルの数)を返すメソッド
