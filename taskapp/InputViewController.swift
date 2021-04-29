@@ -9,7 +9,7 @@ import UIKit
 import RealmSwift
 import UserNotifications
 
-class InputViewController: UIViewController {
+class InputViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var titleTextField: UITextField!
     @IBOutlet weak var contentsTextView: UITextView!
     @IBOutlet weak var datePicker: UIDatePicker!
@@ -22,6 +22,8 @@ class InputViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        titleTextField.delegate = self
+        categoryTextField.delegate = self
         // 背景をタップしたら dismissKeyboard メソッドを呼ぶように設定する
         let tapGesture: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         self.view.addGestureRecognizer(tapGesture)
@@ -30,6 +32,13 @@ class InputViewController: UIViewController {
         contentsTextView.text = task.contents
         datePicker.date = task.date
         categoryTextField.text = task.category
+    }
+    
+    // UITextField のリターンをクリックした時に実行されるメソッド
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        // キーボードを閉じる
+        textField.resignFirstResponder()
+        return true
     }
     
     @objc func dismissKeyboard() {
