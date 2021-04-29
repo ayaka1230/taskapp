@@ -189,7 +189,7 @@
                                 </constraints>
                             </pickerView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gOR-DS-xQE">
-                                <rect key="frame" x="191.5" y="673" width="31" height="30"/>
+                                <rect key="frame" x="191.5" y="792" width="31" height="30"/>
                                 <state key="normal" title="保存"/>
                                 <connections>
                                     <action selector="tapSaveButton:" destination="0hw-Rq-WzM" eventType="touchUpInside" id="uEy-0e-FVH"/>
@@ -204,7 +204,7 @@
                             <constraint firstItem="Qcw-o7-ZMP" firstAttribute="trailing" secondItem="oT1-lm-g78" secondAttribute="trailing" constant="10" id="1ka-C2-bqD"/>
                             <constraint firstItem="Qcw-o7-ZMP" firstAttribute="trailing" secondItem="DMy-qM-ewF" secondAttribute="trailing" constant="10" id="2kI-kn-A8d"/>
                             <constraint firstItem="DMy-qM-ewF" firstAttribute="top" secondItem="wpa-Qr-Q2G" secondAttribute="bottom" constant="10" id="6eU-BD-fBA"/>
-                            <constraint firstItem="gOR-DS-xQE" firstAttribute="top" secondItem="lL3-lf-0Dd" secondAttribute="bottom" constant="50" id="7Xq-Xs-UTb"/>
+                            <constraint firstItem="Qcw-o7-ZMP" firstAttribute="bottom" secondItem="gOR-DS-xQE" secondAttribute="bottom" constant="40" id="As1-NH-VKG"/>
                             <constraint firstItem="oT1-lm-g78" firstAttribute="top" secondItem="4Sw-GD-1gc" secondAttribute="bottom" constant="10" id="BUV-Ll-q3b"/>
                             <constraint firstItem="lL3-lf-0Dd" firstAttribute="top" secondItem="oT1-lm-g78" secondAttribute="bottom" constant="10" id="G3P-px-AGm"/>
                             <constraint firstItem="4Sw-GD-1gc" firstAttribute="leading" secondItem="Qcw-o7-ZMP" secondAttribute="leading" id="JuD-GW-x85"/>
