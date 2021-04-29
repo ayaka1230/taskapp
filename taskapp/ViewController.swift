@@ -9,11 +9,13 @@ import UIKit
 import RealmSwift
 import UserNotifications
 
-class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
-
-    @IBOutlet weak var searchField: UISearchBar!
+class ViewController: UIViewController, UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
+    
+    @IBOutlet weak var categoryTextField: UITextField!
 
     @IBOutlet weak var tableView: UITableView!
+    
+    var categoryPicker = UIPickerView()
     
     // Realm インスタンスを取得する
     let realm = try! Realm()
@@ -22,25 +24,50 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     // 日時の近い順でソート：昇順
     // 以降内容をアップデートするとリスト内は自動的に更新される
     var taskArray = try! Realm().objects(Task.self).sorted(byKeyPath: "date", ascending: true)
+
+    // DB内のカテゴリが格納されるリスト
+    // id でソート：昇順
+    // 以降内容をアップデートすると自動的に更新される
+    var categoryArray = try! Realm().objects(Category.self).sorted(byKeyPath: "id", ascending: true)
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        categoryTextField.delegate = self
         tableView.delegate = self
         tableView.dataSource = self
-        searchField.delegate = self
+        self.createCategoryPickerView()
     }
     
-    @objc func dismissKeyboard() {
-        // キーボードを閉じる
-        view.endEditing(true)
+    // カテゴリの Picker を作成するメソッド
+    func createCategoryPickerView() {
+        categoryPicker.delegate = self
+        categoryTextField.inputView = categoryPicker
+        let toolbar = UIToolbar()
+        toolbar.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: 44)
+        let doneButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(donePicker))
+        toolbar.setItems([doneButtonItem], animated: true)
+        categoryTextField.inputAccessoryView = toolbar
     }
     
-    // segue で画面遷移する時に呼ばれる
+    // Picker の done をタップした時に呼ばれるメソッド
+    @objc func donePicker() {
+        // Picker を閉じる
+        categoryTextField.endEditing(true)
+    }
+    
+    // categoryTextField の clear button をタップした時に呼ばれるメソッド
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        self.resetTaskArray()
+        self.resetPickerSelected()
+        return true
+    }
+    
+    // segue で画面遷移する時に呼ばれるメソッド
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // 検索バーのフォーカスは外しておく
-        searchField.resignFirstResponder()
         let inputViewController: InputViewController = segue.destination as! InputViewController
+        // 遷移する時にピッカーは閉じる
+        self.donePicker()
         if segue.identifier == "cellSegue" {
             let indexPath = self.tableView.indexPathForSelectedRow
             inputViewController.task = taskArray[indexPath!.row]
@@ -57,33 +84,50 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     @IBAction func unwind(_ segue: UIStoryboardSegue) {
     }
     
-    // 入力画面から戻ってきた時に TableView を更新させる
+    // 入力画面から戻ってきた時に呼ばれるメソッド
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // 検索バーの文字とテーブルはリセット
-        searchField.text = ""
+        // categoryTextField をリセット
+        categoryTextField.text = ""
+        self.resetTaskArray()
+        self.resetPickerSelected()
+    }
+    
+    // taskArray をリセットするメソッド
+    func resetTaskArray() {
         taskArray = realm.objects(Task.self).sorted(byKeyPath: "date", ascending: true)
         tableView.reloadData()
     }
     
-    //  検索バーに入力があったら呼ばれる
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        // 入力された値が nil でなければ検索を実行
-        if let word = searchBar.text {
-            if word == "" {
-                taskArray = realm.objects(Task.self).sorted(byKeyPath: "date", ascending: true)
-            } else {
-                // 入力された値とカテゴリが部分一致したタスク
-                taskArray = realm.objects(Task.self).filter("category CONTAINS %@", word)
-            }
-        }
-        tableView.reloadData()
+    // Picker の選択をリセットするメソッド
+    func resetPickerSelected() {
+        self.categoryPicker.selectRow(0, inComponent: 0, animated: true)
     }
     
-    // 検索時 return がタップされた時に呼ばれるメソッド
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        // キーボードを閉じる
-        searchBar.resignFirstResponder()
+    // Picker の列数の設定
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    // Picker の行とデータ要素数の設定
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return categoryArray.count
+    }
+    
+    // Picker のデータを設定
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return categoryArray[row].name
+    }
+    
+    // カテゴリが選択された時に呼ばれるメソッド
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        // 選択しているカテゴリ名を categoryTextField に表示する
+        categoryTextField.text = categoryArray[row].name
+        // 選択したカテゴリでフィルタする
+        let selectedCategoryIndex = categoryPicker.selectedRow(inComponent: 0)
+        let selectedCategory = categoryArray[selectedCategoryIndex]
+        taskArray = realm.objects(Task.self).filter("category == %@", selectedCategory)
+        tableView.reloadData()
     }
 
     // データの数(=セルの数)を返すメソッド
@@ -103,7 +147,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         let dateString: String = formatter.string(from: task.date)
         cell.dateLabel.text = dateString
         
-        cell.categoryLabel.text = task.category
+        cell.categoryLabel.text = task.category?.name
 
         return cell
     }

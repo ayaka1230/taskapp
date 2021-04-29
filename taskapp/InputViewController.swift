@@ -9,21 +9,31 @@ import UIKit
 import RealmSwift
 import UserNotifications
 
-class InputViewController: UIViewController, UITextFieldDelegate {
+class InputViewController: UIViewController, UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
+    
     @IBOutlet weak var titleTextField: UITextField!
     @IBOutlet weak var contentsTextView: UITextView!
     @IBOutlet weak var datePicker: UIDatePicker!
-    @IBOutlet weak var categoryTextField: UITextField!
+    @IBOutlet weak var categoryPicker: UIPickerView!
     
     let realm = try! Realm()
     var task: Task!
+
+    // DB内のカテゴリが格納されるリスト
+    // id でソート：昇順
+    // 以降内容をアップデートすると自動的に更新される
+    var categoryArray = try! Realm().objects(Category.self).sorted(byKeyPath: "id", ascending: true)
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
         titleTextField.delegate = self
-        categoryTextField.delegate = self
+        categoryPicker.delegate = self
+        categoryPicker.dataSource = self
+        
+        setDefaultCategory()
+        
         // 背景をタップしたら dismissKeyboard メソッドを呼ぶように設定する
         let tapGesture: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         self.view.addGestureRecognizer(tapGesture)
@@ -31,10 +41,51 @@ class InputViewController: UIViewController, UITextFieldDelegate {
         titleTextField.text = task.title
         contentsTextView.text = task.contents
         datePicker.date = task.date
-        categoryTextField.text = task.category
+        // タスクのカテゴリが存在する場合（＝セルをタップして遷移してきた場合）、Picker を合わせておく
+        if task.category != nil {
+            let targetCategoryIndex = categoryArray.index(of: task.category!)
+            self.categoryPicker.selectRow(targetCategoryIndex!, inComponent: 0, animated: true)
+        }
     }
     
-    // UITextField のリターンをクリックした時に実行されるメソッド
+    // カテゴリが何も設定されていない場合、カテゴリに「なし」を追加しておくメソッド
+    func setDefaultCategory() {
+        let category = Category()
+        if categoryArray.count == 0 {
+            try! realm.write {
+                category.id = 1
+                category.name = "なし"
+                self.realm.add(category, update: .modified)
+            }
+        }
+        categoryPicker.reloadAllComponents()
+    }
+    
+    // カテゴリ追加画面から戻ってきた時に呼ばれるメソッド
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        categoryPicker.reloadAllComponents()
+    }
+    
+    // Picker の列数の設定
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    // Picker の行とデータ要素数の設定
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return categoryArray.count
+    }
+    
+    // Picker のデータを設定
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return categoryArray[row].name
+    }
+    
+    @IBAction func unwind(_ segue: UIStoryboardSegue) {
+    }
+    
+    // UITextField のリターンをタップした時に実行されるメソッド
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         // キーボードを閉じる
         textField.resignFirstResponder()
@@ -46,12 +97,16 @@ class InputViewController: UIViewController, UITextFieldDelegate {
         view.endEditing(true)
     }
     
+    // 保存ボタンがタップされた時に呼び出されるメソッド
     @IBAction func tapSaveButton(_ sender: Any) {
+
+        let selectedCategoryIndex = categoryPicker.selectedRow(inComponent: 0)
+
         try! realm.write {
             self.task.title = self.titleTextField.text!
             self.task.contents = self.contentsTextView.text
             self.task.date = self.datePicker.date
-            self.task.category = self.categoryTextField.text!
+            self.task.category = self.categoryArray[selectedCategoryIndex]
             self.realm.add(self.task, update: .modified)
         }
         setNotification(task: task)
