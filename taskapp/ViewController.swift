@@ -42,6 +42,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     // segue で画面遷移する時に呼ばれる
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        // 検索バーのフォーカスは外しておく
+        searchField.resignFirstResponder()
         let inputViewController: InputViewController = segue.destination as! InputViewController
         if segue.identifier == "cellSegue" {
             let indexPath = self.tableView.indexPathForSelectedRow
