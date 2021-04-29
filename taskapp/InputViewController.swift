@@ -46,7 +46,7 @@ class InputViewController: UIViewController, UITextFieldDelegate {
         view.endEditing(true)
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
+    @IBAction func tapSaveButton(_ sender: Any) {
         try! realm.write {
             self.task.title = self.titleTextField.text!
             self.task.contents = self.contentsTextView.text
@@ -55,8 +55,8 @@ class InputViewController: UIViewController, UITextFieldDelegate {
             self.realm.add(self.task, update: .modified)
         }
         setNotification(task: task)
-        super.viewWillDisappear(animated)
     }
+    
     
     // タスクのローカル通知を登録する
     func setNotification(task: Task) {
